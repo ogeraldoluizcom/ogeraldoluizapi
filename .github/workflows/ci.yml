@@ -1,0 +1,124 @@
+name: CI/CD Pipeline
+run-name: Pipeline CI/CD executed by ${{ github.actor }} in ${{ github.run_number }}
+
+on:
+  push:
+    branches: [develop]
+  # pull_request:
+  #   branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # Continuous Integration (CI)
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Setup Node.js environment
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Cache Node.js dependencies
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Build the application
+      - name: Build
+        run: npm run build
+
+      # Run linting
+      - name: Linting
+        run: npm run lint
+
+  # Test
+  Tests:
+    needs: [CI]
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  # Continuous Deployment (CD)
+  CD:
+    needs: [Tests]
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Setup DockerHub credentials
+      - name: Setup Dockerhub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build and push Docker image
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: true
+          tags: |
+            geraldobl58/api:v${{ github.run_number }}
+            geraldobl58/api:latest
+
+  # Deploy
+  deploy-development:
+    needs: [CD]
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    with:
+      environment-name: development
+      environment-url: https://development.ogeraldoluiz.com
+      K8S_NAMESPACE: development
+
+  deploy-staging:
+    needs: [CD]
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    with:
+      environment-name: staging
+      environment-url: https://staging.ogeraldoluiz.com
+      K8S_NAMESPACE: staging
+
+  deploy-production:
+    needs: [deploy-development, deploy-staging]
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    with:
+      environment-name: production
+      environment-url: https://production.ogeraldoluiz.com
+      K8S_NAMESPACE: production
+
+  #Notifications
+  Notify:
+    needs:
+      [CI, Tests, CD, deploy-development, deploy-staging, deploy-production]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Success
+        if: success()
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+             "text": "✅ CI/CD Pipeline completed successfully!\nExecuted by ${{ github.actor }} in run #${{ github.run_number }}\n\n*Commit:* ${{ github.event.head_commit.message }}\n*Branch:* ${{ github.ref_name }}\n*Repository:* ${{ github.repository }}\n*URL:* ${{ github.event.head_commit.url }}\n*Committer:* ${{ github.actor }}\n*SHA:* ${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
