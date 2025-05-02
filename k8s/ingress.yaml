@@ -10,7 +10,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: development.ogeraldoluiz.com
+    - host: api.development.ogeraldoluiz.com
       http:
         paths:
           - pathType: Prefix

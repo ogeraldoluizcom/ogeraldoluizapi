@@ -44,15 +44,12 @@ jobs:
           sed -i 's|namespace: development|namespace: ${{ inputs.K8S_NAMESPACE }}|g' k8s/deployment.yaml
           sed -i 's|namespace: development|namespace: ${{ inputs.K8S_NAMESPACE }}|g' k8s/service.yaml
           sed -i 's|namespace: development|namespace: ${{ inputs.K8S_NAMESPACE }}|g' k8s/ingress.yaml
-          sed -i 's|host: development.ogeraldoluiz.com|host: ${{ inputs.environment-url }}|g' k8s/ingress.yaml
+          sed -i 's|host: api.development.ogeraldoluiz.com|host: ${{ inputs.environment-url }}|g' k8s/ingress.yaml
           sed -i 's|https://||g' k8s/ingress.yaml
 
       - name: Create Namespace if Not Exists
         run: |
           kubectl get namespace ${{ inputs.K8S_NAMESPACE }} || kubectl create namespace ${{ inputs.K8S_NAMESPACE }}
-
-        # run: |
-        #   sed -i 's/host: development.ogeraldoluiz.com/host:${{ vars.BASE_URL }}/g' k8s/deployment.yaml
 
       # Deploy to Kubernetes
       - name: Deploy to Kubernetes
