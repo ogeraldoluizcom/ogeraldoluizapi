@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api.ogeraldoluiz
+  name: ogeraldoluizapi
   namespace: development
   labels:
-    app: api.ogeraldoluiz
+    app: ogeraldoluizapi
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: api.ogeraldoluiz
+      app: ogeraldoluizapi
   template:
     metadata:
       labels:
-        app: api.ogeraldoluiz
+        app: ogeraldoluizapi
     spec:
       containers:
-        - name: api.ogeraldoluiz
-          image: geraldobl58/api.ogeraldoluiz:latest
+        - name: ogeraldoluizapi
+          image: geraldobl58/ogeraldoluizapi:latest
           ports:
             - containerPort: 3000
           env:

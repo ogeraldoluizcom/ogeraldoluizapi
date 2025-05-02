@@ -75,8 +75,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            geraldobl58/api.ogeraldoluiz:v${{ github.run_number }}
-            geraldobl58/api.ogeraldoluiz:latest
+            geraldobl58/ogeraldoluizapi:v${{ github.run_number }}
+            geraldobl58/ogeraldoluizapi:latest
 
   # Deploy
   deploy-development:
@@ -106,9 +106,10 @@ jobs:
       environment-url: https://ogeraldoluiz.com
       K8S_NAMESPACE: production
 
-#Notifications
+  #Notifications
   Notify:
-    needs: [CI, Tests, CD, deploy-development, deploy-staging, deploy-production]
+    needs:
+      [CI, Tests, CD, deploy-development, deploy-staging, deploy-production]
     runs-on: ubuntu-latest
     steps:
       - name: Notify Success

@@ -63,4 +63,4 @@ jobs:
             k8s/deployment.yaml
             k8s/service.yaml
             k8s/ingress.yaml
-          images: geraldobl58/api.ogeraldoluiz:v${{ github.run_number }}
+          images: geraldobl58/ogeraldoluizapi:v${{ github.run_number }}

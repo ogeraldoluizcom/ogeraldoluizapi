@@ -1,10 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: api.ogeraldoluiz
+  name: ogeraldoluizapi
   namespace: development
   labels:
-    name: api.ogeraldoluiz
+    name: ogeraldoluizapi
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /api
 spec:
@@ -17,6 +17,6 @@ spec:
             path: "/api"
             backend:
               service:
-                name: api.ogeraldoluiz
+                name: ogeraldoluizapi
                 port:
                   number: 80
