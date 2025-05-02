@@ -6,7 +6,7 @@ metadata:
   labels:
     name: ogeraldoluizapi
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /api
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
