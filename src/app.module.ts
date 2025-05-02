@@ -1,9 +1,9 @@
 import { APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ThrottlerModule } from '@nestjs/throttler';
+
 import { CustomThrottlerGuard } from './guards/custom-throttler/custom-throttler.guard';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -11,14 +11,14 @@ import { CustomThrottlerGuard } from './guards/custom-throttler/custom-throttler
       throttlers: [
         {
           ttl: 120000, // Tempo de vida em milissegundos (2 minutos)
-          limit: 10, // Máximo de 2 requisições por IP
+          limit: 10, // Máximo de 10 requisições por IP
         },
       ],
     }),
+    HealthModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_GUARD,
       useClass: CustomThrottlerGuard,
