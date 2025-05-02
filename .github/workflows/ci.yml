@@ -112,6 +112,7 @@ jobs:
       [CI, Tests, CD, deploy-development, deploy-staging, deploy-production]
     runs-on: ubuntu-latest
     steps:
+      # Notificar sucesso
       - name: Notify Success
         if: success()
         uses: slackapi/slack-github-action@v1.23.0
@@ -119,6 +120,18 @@ jobs:
           payload: |
             {
              "text": "✅ CI/CD Pipeline completed successfully!\nExecuted by ${{ github.actor }} in run #${{ github.run_number }}\n\n*Commit:* ${{ github.event.head_commit.message }}\n*Branch:* ${{ github.ref_name }}\n*Repository:* ${{ github.repository }}\n*URL:* ${{ github.event.head_commit.url }}\n*Committer:* ${{ github.actor }}\n*SHA:* ${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+      # Notificar falha
+      - name: Notify Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+             "text": "❌ CI/CD Pipeline failed!\nExecuted by ${{ github.actor }} in run #${{ github.run_number }}\n\n*Commit:* ${{ github.event.head_commit.message }}\n*Branch:* ${{ github.ref_name }}\n*Repository:* ${{ github.repository }}\n*URL:* ${{ github.event.head_commit.url }}\n*Committer:* ${{ github.actor }}\n*SHA:* ${{ github.sha }}\n\nPlease check the logs for more details."
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
