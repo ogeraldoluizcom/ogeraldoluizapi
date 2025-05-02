@@ -75,8 +75,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            geraldobl58/api:v${{ github.run_number }}
-            geraldobl58/api:latest
+            geraldobl58/api.ogeraldoluiz:v${{ github.run_number }}
+            geraldobl58/api.ogeraldoluiz:latest
 
   # Deploy
   deploy-development:
@@ -103,13 +103,12 @@ jobs:
     secrets: inherit
     with:
       environment-name: production
-      environment-url: https://production.ogeraldoluiz.com
+      environment-url: https://ogeraldoluiz.com
       K8S_NAMESPACE: production
 
-  #Notifications
+#Notifications
   Notify:
-    needs:
-      [CI, Tests, CD, deploy-development, deploy-staging, deploy-production]
+    needs: [CI, Tests, CD, deploy-development, deploy-staging, deploy-production]
     runs-on: ubuntu-latest
     steps:
       - name: Notify Success
@@ -118,7 +117,7 @@ jobs:
         with:
           payload: |
             {
-             "text": "✅ CI/CD Pipeline completed successfully!\nExecuted by ${{ github.actor }} in run #${{ github.run_number }}\n\n*Commit:* ${{ github.event.head_commit.message }}\n*Branch:* ${{ github.ref_name }}\n*Repository:* ${{ github.repository }}\n*URL:* ${{ github.event.head_commit.url }}\n*Committer:* ${{ github.actor }}\n*SHA:* ${{ github.sha }}"
+            "text": "✅ CI/CD Pipeline completed successfully!\nExecuted by ${{ github.actor }} in run #${{ github.run_number }}\n\n*Commit:* ${{ github.event.head_commit.message }}\n*Branch:* ${{ github.ref_name }}\n*Repository:* ${{ github.repository }}\n*URL:* ${{ github.event.head_commit.url }}\n*Committer:* ${{ github.actor }}\n*SHA:* ${{ github.sha }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
