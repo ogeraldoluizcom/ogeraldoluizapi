@@ -3,7 +3,7 @@ run-name: Pipeline CI/CD executed by ${{ github.actor }} in ${{ github.run_numbe
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
   # pull_request:
   #   branches: [main]
   workflow_dispatch:
@@ -105,6 +105,30 @@ jobs:
       environment-name: production
       environment-url: https://api.ogeraldoluiz.com
       K8S_NAMESPACE: production
+
+  create-release:
+    needs: [deploy-production] # Executa após o deploy de produção
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout do repositório
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Criar uma nova release
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ github.run_number }} # Nome da tag (incremental com base no número da execução)
+          release_name: 'Release v${{ github.run_number }}' # Nome da release
+          body: |
+            ## Release Notes
+            - Deploy realizado com sucesso para o ambiente de produção.
+            - Commit: ${{ github.event.head_commit.message }}
+            - Autor: ${{ github.actor }}
+          draft: false # Define se a release será um rascunho
+          prerelease: false # Define se a release será uma pré-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Token para autenticação
 
   # Notificar sucesso ou falha para desenvolvimento
   notify-development:
