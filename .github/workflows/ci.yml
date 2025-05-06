@@ -3,10 +3,15 @@ run-name: Pipeline CI/CD executed by ${{ github.actor }} in ${{ github.run_numbe
 
 on:
   push:
-    branches: [develop]
+    branches: [main] # Apenas a branch main dispara o workflow para produção
   # pull_request:
   #   branches: [main]
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy (e.g., production)'
+        required: true
+        default: 'production'
 
 jobs:
   # Continuous Integration (CI)
@@ -98,6 +103,7 @@ jobs:
       K8S_NAMESPACE: staging
 
   deploy-production:
+    if: github.ref == 'refs/heads/main' # Garante que só será executado na branch main
     needs: [deploy-development, deploy-staging]
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
