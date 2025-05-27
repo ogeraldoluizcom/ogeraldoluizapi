@@ -48,7 +48,7 @@ jobs:
           sed -i 's|namespace: development|namespace: ${{ inputs.K8S_NAMESPACE }}|g' $ENV_FILE
 
           # Update host in ingress files
-          sed -i 's|host: development.ogeraldoluiz.com|host: ${{ inputs.environment-url }}|g' $ENV_FILE
+          sed -i 's|host: api.development.ogeraldoluiz.com|host: ${{ inputs.environment-url }}|g' $ENV_FILE
 
       - name: Create Namespace if Not Exists
         run: |
@@ -62,4 +62,4 @@ jobs:
           manifests: |
             k8s/${{ inputs.environment-name }}-k8s.yaml
 
-          images: geraldobl58/ogeraldoluiz:v${{ github.run_number }}
+          images: geraldobl58/ogeraldoluizapi:v${{ github.run_number }}
