@@ -41,11 +41,14 @@ jobs:
 
       - name: Update Deployment
         run: |
-          sed -i 's|namespace: development|namespace: ${{ inputs.K8S_NAMESPACE }}|g' k8s/deployment.yaml
-          sed -i 's|namespace: development|namespace: ${{ inputs.K8S_NAMESPACE }}|g' k8s/service.yaml
-          sed -i 's|namespace: development|namespace: ${{ inputs.K8S_NAMESPACE }}|g' k8s/ingress.yaml
-          sed -i 's|host: api.development.ogeraldoluiz.com|host: ${{ inputs.environment-url }}|g' k8s/ingress.yaml
-          sed -i 's|https://||g' k8s/ingress.yaml
+          # Find the appropriate environment file based on input
+          ENV_FILE="k8s/${{ inputs.environment-name }}-k8s.yaml"
+
+          # Update namespace in all relevant files
+          sed -i 's|namespace: development|namespace: ${{ inputs.K8S_NAMESPACE }}|g' $ENV_FILE
+
+          # Update host in ingress files
+          sed -i 's|host: development.ogeraldoluiz.com|host: ${{ inputs.environment-url }}|g' $ENV_FILE
 
       - name: Create Namespace if Not Exists
         run: |
@@ -57,7 +60,6 @@ jobs:
         with:
           namespace: ${{ inputs.K8S_NAMESPACE }}
           manifests: |
-            k8s/deployment.yaml
-            k8s/service.yaml
-            k8s/ingress.yaml
-          images: geraldobl58/ogeraldoluizapi:v${{ github.run_number }}
+            k8s/${{ inputs.environment-name }}-k8s.yaml
+
+          images: geraldobl58/ogeraldoluiz:v${{ github.run_number }}
